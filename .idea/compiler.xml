@@ -1,0 +1,11 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="CompilerConfiguration">
+    <bytecodeTargetLevel target="1.8">
+      <module name="Ayan_New_Networking.app" target="15" />
+      <module name="Ayan_New_Networking.buildSrc" target="15" />
+      <module name="Ayan_New_Networking.buildSrc.main" target="15" />
+      <module name="Ayan_New_Networking.buildSrc.test" target="15" />
+    </bytecodeTargetLevel>
+  </component>
+</project>

@@ -1,0 +1,88 @@
+package com.alitafreshi.ayan_networking.interactors
+
+import androidx.datastore.core.DataStore
+import androidx.datastore.preferences.core.Preferences
+import com.alitafreshi.ayan_networking.AyanRepository
+import com.alitafreshi.ayan_networking.Identity
+import com.alitafreshi.ayan_networking.data_store.AppDataStore
+import com.alitafreshi.ayan_networking.data_store.readValue
+import com.alitafreshi.ayan_networking.exceptions.LoginRequiredException
+import com.alitafreshi.ayan_networking.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.state_handling.*
+import com.alitafreshi.ayan_networking.state_strategy.StateHandlingUseCase
+import kotlinx.coroutines.CoroutineDispatcher
+import kotlinx.coroutines.CoroutineName
+import kotlinx.coroutines.currentCoroutineContext
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.job
+
+class AyanCallUseCase(
+    private val ayanRepository: AyanRepository,
+    private val appDataState: AppDataStore,
+    private val dataStore: DataStore<Preferences>,
+    private val ioDispatcher: CoroutineDispatcher,
+    private val statsQueue: StateHandlingUseCase<UIComponent>
+) {
+    operator fun <Input, Output, Event> invoke(
+        baseUrl: String? = null,
+        hasIdentity: Boolean = true,
+        endpoint: String,
+        input: Input,
+        stateEvent: Event,
+        requestHeaders: HashMap<String, String>? = null
+    ): Flow<DataState<Output>> = flow<DataState<Output>> {
+
+        val result = ayanRepository.ayanCall<Input, Output>(
+            baseUrl = baseUrl,
+            endpoint = endpoint,
+            input = input,
+            identity = if (hasIdentity) appDataState.readValue<Identity>(
+                //TODO It Should Be Converted To the Constance
+                key = "ayan_token",
+                defaultValue = null,
+                dataStore = dataStore
+            ) else null,
+            requestHeaders = requestHeaders
+        )
+
+        when (result.status.code) {
+            ApiErrorCode.LOGIN_REQUIRED -> {
+                throw LoginRequiredException(
+                    message = result.status.description,
+                    causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
+                )
+            }
+        }
+
+        emit(DataState.Data(data = result.parameters))
+
+    }.onStart {
+        statsQueue.addOrUpdate(
+            RequestGenericState(
+                uiComponent = UIComponent.Loading(),
+                stateEvent = stateEvent,
+                job = currentCoroutineContext().job,
+                requestState = RequestState.Loading
+            )
+        )
+
+    }.catch { throwable ->
+        //TODO We For Positions That Servers Error Message Dose Not Has Any Error Message We Should Return A Default Message
+        statsQueue.cancelAll(
+            throwable = throwable,
+            uiComponent = UIComponent.Error(
+                errorDescription = UiText.DynamicString(
+                    value = throwable.message ?: ""
+                )
+            ),
+            stateEvent = stateEvent
+        )
+    }.onCompletion {
+        when (it) {
+            is SuccessCompletionException -> {
+                statsQueue.remove(job = currentCoroutineContext().job)
+            }
+        }
+    }.flowOn(ioDispatcher)
+}
+
