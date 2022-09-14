@@ -7,5 +7,7 @@ class LoginRequiredException(message: String, causeCoroutineName: String? = null
 
 class UserCancellationException(message: String) : CancellationException(message = message)
 
+class DataStoreUnknownException(message: String) : Exception(message = message)
+
 class SuccessCompletionException(message: String) : Exception(message = message)
 

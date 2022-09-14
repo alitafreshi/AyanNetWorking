@@ -3,7 +3,6 @@ package com.alitafreshi.ayan_networking
 import io.ktor.client.*
 import io.ktor.client.engine.okhttp.*
 import io.ktor.client.plugins.logging.*
-import kotlinx.coroutines.Deferred
 
 interface AyanRepository {
 

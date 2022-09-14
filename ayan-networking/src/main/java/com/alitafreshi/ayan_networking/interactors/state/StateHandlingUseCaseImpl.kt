@@ -1,5 +1,6 @@
 package com.alitafreshi.ayan_networking.interactors.state
 
+import com.alitafreshi.ayan_networking.exceptions.DataStoreUnknownException
 import com.alitafreshi.ayan_networking.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.exceptions.UserCancellationException
 import com.alitafreshi.ayan_networking.state_handling.RequestGenericState
@@ -11,13 +12,9 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.updateAndGet
 
-/**
- * Kotlin version of a java.util Queue
- * https://docs.oracle.com/javase/8/docs/api/java/util/Queue.html
- */
-
 class StateHandlingUseCaseImpl<T>(
-    private val LoginRequiredExceptionHandler: ExceptionHandler<T>
+    private val loginRequiredExceptionHandler: ExceptionHandler<T>,
+    private val unexpectedExceptionHandler: ExceptionHandler<T>
 ) : StateHandlingUseCase<T> {
 
     private val _items = MutableStateFlow(value = mutableListOf<RequestGenericState<T>>())
@@ -55,12 +52,22 @@ class StateHandlingUseCaseImpl<T>(
     }
 
     //TODO This Cancel All Function  Should Handel Each Exception like (LoginRequiredException or Etc) But We Can Do it in a clean way maybe Strategy Pattern
-    override fun cancelAll(uiComponent: T, throwable: Throwable?, stateEvent: Any?) {
+    override fun handleCancellation(uiComponent: T, throwable: Throwable?, stateEvent: Any?) {
         //TODO We need Each Logic For Each Exception Not One Handler For All Exceptions
         when (throwable) {
-            is LoginRequiredException -> {
+            is LoginRequiredException, is DataStoreUnknownException -> {
                 _items.updateAndGet {
-                    LoginRequiredExceptionHandler(
+                    loginRequiredExceptionHandler(
+                        currentRequests = it,
+                        throwable = throwable,
+                        uiComponent = uiComponent
+                    )
+                }
+            }
+            else -> {
+                //TODO May Be Some unexpected exceptions happen during the network call we should handle them here
+                _items.updateAndGet {
+                    unexpectedExceptionHandler(
                         currentRequests = it,
                         throwable = throwable,
                         uiComponent = uiComponent

@@ -9,7 +9,7 @@ interface StateHandlingUseCase<T> {
     fun addOrUpdate(element: RequestGenericState<T>)
     fun remove(job: Job): Boolean
     fun findItem(condition: (item: RequestGenericState<T>) -> Boolean): RequestGenericState<T>?
-    fun cancelAll(uiComponent: T, throwable: Throwable? = null, stateEvent: Any? = null)
+    fun handleCancellation(uiComponent: T, throwable: Throwable? = null, stateEvent: Any? = null)
     fun cancelByUser()
     fun clear()
 }
