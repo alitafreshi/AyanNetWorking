@@ -1,16 +1,20 @@
 package com.alitafreshi.ayan_networking.state_handling
 
-sealed class DataState<T> {
+sealed class DataState<DataType, StateEvent> {
 
-    data class Error<T>(
-        val uiComponent: UIComponent
-    ) : DataState<T>()
+    data class Error<DataType, StateEvent>(
+        val uiComponent: UIComponent,
+        val stateEvent: StateEvent,
+        val throwable: Throwable
+    ) : DataState<DataType, StateEvent>()
 
-    data class Data<T>(
-        val data: T? = null
-    ) : DataState<T>()
+    data class Data<DataType, StateEvent>(
+        val data: DataType? = null,
+        val stateEvent: StateEvent
+    ) : DataState<DataType, StateEvent>()
 
-    data class Loading<T>(
-        val bottomSheetState: BottomSheetState = BottomSheetState.Idle
-    ) : DataState<T>()
+    data class Loading<DataType, StateEvent>(
+        val bottomSheetState: BottomSheetState = BottomSheetState.Idle,
+        val stateEvent: StateEvent
+    ) : DataState<DataType, StateEvent>()
 }

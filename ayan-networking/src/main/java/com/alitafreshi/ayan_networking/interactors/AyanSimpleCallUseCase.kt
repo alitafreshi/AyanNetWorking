@@ -4,10 +4,14 @@ import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.Preferences
 import com.alitafreshi.ayan_networking.AyanRepository
 import com.alitafreshi.ayan_networking.Identity
+import com.alitafreshi.ayan_networking.constants.ApiErrorCode
+import com.alitafreshi.ayan_networking.constants.ApiSuccessCode
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
-import com.alitafreshi.ayan_networking.exceptions.LoginRequiredException
-import com.alitafreshi.ayan_networking.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
+import com.alitafreshi.ayan_networking.constants.exceptions.ServerErrorException
+import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
 import com.alitafreshi.ayan_networking.state_handling.*
 import com.alitafreshi.ayan_networking.state_strategy.StateHandlingUseCase
 import kotlinx.coroutines.CoroutineDispatcher
@@ -20,6 +24,7 @@ class AyanSimpleCallUseCase(
     private val ayanRepository: AyanRepository,
     private val appDataState: AppDataStore,
     private val dataStore: DataStore<Preferences>,
+    private val ayanHeaderManager: AyanHeaderManager,
     private val ioDispatcher: CoroutineDispatcher,
     private val statsQueue: StateHandlingUseCase<UIComponent>
 ) {
@@ -40,17 +45,25 @@ class AyanSimpleCallUseCase(
                 defaultValue = null,
                 dataStore = dataStore
             ) else null,
-            requestHeaders = requestHeaders
+            requestHeaders = ayanHeaderManager(requestHeaders = requestHeaders)
         )
 
-        when (result.status.code) {
-            ApiErrorCode.LOGIN_REQUIRED -> {
-                throw LoginRequiredException(
-                    message = result.status.description,
-                    causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
-                )
+        if (result.status.code != ApiSuccessCode.Success)
+            when (result.status.code) {
+                ApiErrorCode.LOGIN_REQUIRED -> {
+                    throw LoginRequiredException(
+                        message = result.status.description,
+                        causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
+                    )
+                }
+                else -> {
+                    throw ServerErrorException(
+                        errorCode = result.status.code,
+                        message = result.status.description,
+                        causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
+                    )
+                }
             }
-        }
 
         emit(result.parameters)
 

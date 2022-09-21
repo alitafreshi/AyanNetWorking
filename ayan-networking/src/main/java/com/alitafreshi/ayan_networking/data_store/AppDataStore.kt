@@ -2,7 +2,7 @@ package com.alitafreshi.ayan_networking.data_store
 
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
-import com.alitafreshi.ayan_networking.exceptions.DataStoreUnknownException
+import com.alitafreshi.ayan_networking.constants.exceptions.DataStoreUnknownException
 import kotlinx.coroutines.flow.first
 import kotlin.jvm.Throws
 
@@ -19,7 +19,7 @@ suspend inline fun <reified T> AppDataStore.readValue(
     key: String,
     defaultValue: T?,
     dataStore: DataStore<Preferences>
-): T? = when (T::class) {
+): T = when (T::class) {
     String::class -> (dataStore.data.first()[stringPreferencesKey(key)] ?: defaultValue) as T
     Boolean::class -> (dataStore.data.first()[booleanPreferencesKey(key)] ?: defaultValue) as T
     Int::class -> (dataStore.data.first()[intPreferencesKey(key)] ?: defaultValue) as T

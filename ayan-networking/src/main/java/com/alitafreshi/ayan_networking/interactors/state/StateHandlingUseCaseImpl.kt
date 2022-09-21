@@ -1,8 +1,9 @@
 package com.alitafreshi.ayan_networking.interactors.state
 
-import com.alitafreshi.ayan_networking.exceptions.DataStoreUnknownException
-import com.alitafreshi.ayan_networking.exceptions.LoginRequiredException
-import com.alitafreshi.ayan_networking.exceptions.UserCancellationException
+import com.alitafreshi.ayan_networking.constants.exceptions.DataStoreUnknownException
+import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
+import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.constants.exceptions.UserCancellationException
 import com.alitafreshi.ayan_networking.state_handling.RequestGenericState
 import com.alitafreshi.ayan_networking.state_handling.RequestState
 import com.alitafreshi.ayan_networking.state_strategy.ExceptionHandler
@@ -48,10 +49,14 @@ class StateHandlingUseCaseImpl<T>(
     }
 
     override fun clear() {
-        _items.value.removeAll { true }
+        _items.updateAndGet {
+            it.apply {
+                it.removeAll { true }
+            }
+        }
     }
 
-    //TODO This Cancel All Function  Should Handel Each Exception like (LoginRequiredException or Etc) But We Can Do it in a clean way maybe Strategy Pattern
+    //TODO This handleCancellation  Should Handel Each Exception like (LoginRequiredException or Etc) But We Can Do it in a clean way maybe Strategy Pattern
     override fun handleCancellation(uiComponent: T, throwable: Throwable?, stateEvent: Any?) {
         //TODO We need Each Logic For Each Exception Not One Handler For All Exceptions
         when (throwable) {
@@ -64,6 +69,9 @@ class StateHandlingUseCaseImpl<T>(
                     )
                 }
             }
+            //TODO We Don't Do Anything Here
+            is SuccessCompletionException -> {}
+
             else -> {
                 //TODO May Be Some unexpected exceptions happen during the network call we should handle them here
                 _items.updateAndGet {

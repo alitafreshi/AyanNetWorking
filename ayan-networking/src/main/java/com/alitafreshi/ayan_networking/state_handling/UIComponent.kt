@@ -11,8 +11,7 @@ sealed class UIComponent {
      * so we use click on [errorButton] / try button the event relaunch so the request send again to the server
      * @param errorTitle
      * @param errorButton
-     * @param errorDescription
-     * @param stateEvent*/
+     * @param errorDescription*/
     data class Error(
         var errorTitle: String = "خطا",
         var errorDescription: UiText,
