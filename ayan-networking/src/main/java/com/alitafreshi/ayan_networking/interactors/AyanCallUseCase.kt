@@ -5,10 +5,12 @@ import androidx.datastore.preferences.core.Preferences
 import com.alitafreshi.ayan_networking.AyanRepository
 import com.alitafreshi.ayan_networking.Identity
 import com.alitafreshi.ayan_networking.constants.ApiErrorCode
+import com.alitafreshi.ayan_networking.constants.Constants
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
 import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
+import com.alitafreshi.ayan_networking.interactors.local_message_manager.LocalMessageHandlerUseCase
 import com.alitafreshi.ayan_networking.state_handling.*
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -21,6 +23,7 @@ class AyanCallUseCase(
     private val appDataState: AppDataStore,
     private val dataStore: DataStore<Preferences>,
     private val ayanHeaderManager: AyanHeaderManager,
+    private val localMessageHandlerUseCas: LocalMessageHandlerUseCase,
     private val ioDispatcher: CoroutineDispatcher
 ) {
     operator fun <Input, Output, Event> invoke(
@@ -31,6 +34,8 @@ class AyanCallUseCase(
         stateEvent: Event,
         requestHeaders: HashMap<String, String>? = null
     ): Flow<DataState<Output, Event>> = flow<DataState<Output, Event>> {
+
+
 
         val result = ayanRepository.ayanCall<Input, Output>(
             baseUrl = baseUrl,
@@ -65,13 +70,20 @@ class AyanCallUseCase(
         )
     }.catch { throwable ->
         //TODO HERE WE SHOULD PASS THE ERROR CODES TO THE CLIENT
+        val appLanguage = appDataState.readValue(
+            key = Constants.SELECTED_APP_LANGUAGE_KEY,
+            defaultValue = Constants.PERSIAN_APP_LANGUAGE_KEY,
+            dataStore = dataStore
+        )
+
         emit(
             DataState.Error(
                 throwable = throwable,
                 uiComponent = UIComponent.Error(
-                    errorDescription = if (!throwable.message.isNullOrEmpty()) UiText.DynamicString(
-                        value = throwable.message!!
-                    ) else UiText.StringResource(resId =)
+                    errorDescription = localMessageHandlerUseCas(
+                        appLanguage = appLanguage,
+                        throwable = throwable
+                    )
                 ),
                 stateEvent = stateEvent
             )

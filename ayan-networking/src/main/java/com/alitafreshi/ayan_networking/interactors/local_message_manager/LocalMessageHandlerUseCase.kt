@@ -1,17 +1,11 @@
 package com.alitafreshi.ayan_networking.interactors.local_message_manager
 
-import androidx.datastore.core.DataStore
-import androidx.datastore.preferences.core.Preferences
 import com.alitafreshi.ayan_networking.constants.Constants.ENGLISH_APP_LANGUAGE_KEY
 import com.alitafreshi.ayan_networking.constants.Constants.PERSIAN_APP_LANGUAGE_KEY
-import com.alitafreshi.ayan_networking.constants.Constants.SELECTED_APP_LANGUAGE_KEY
-import com.alitafreshi.ayan_networking.data_store.AppDataStore
-import com.alitafreshi.ayan_networking.data_store.readValue
+import com.alitafreshi.ayan_networking.constants.exceptions.TimeOutException
+import com.alitafreshi.ayan_networking.state_handling.UiText
 
-class LocalMessageHandler(
-    private val appDataState: AppDataStore,
-    private val dataStore: DataStore<Preferences>
-) {
+class LocalMessageHandlerUseCase {
 
     companion object {
         const val NO_CODE_SERVER_ERROR_CODE = "NOCODEFROMSERVER"
@@ -43,16 +37,40 @@ class LocalMessageHandler(
     }
 
     //TODO We Should Define That How We Provide Local Messages
-    suspend operator fun invoke(throwable: Throwable): String {
+    operator fun invoke(appLanguage: String, throwable: Throwable): UiText =
+        throwable.message?.let { errorMessage ->
+            UiText.DynamicString(value = errorMessage)
+        } ?: when (appLanguage) {
+            PERSIAN_APP_LANGUAGE_KEY -> {
+                persianLocalMessage(throwable = throwable)
+            }
 
-        return when (appDataState.readValue(
-            key = SELECTED_APP_LANGUAGE_KEY,
-            defaultValue = PERSIAN_APP_LANGUAGE_KEY,
-            dataStore = dataStore
-        )) {
+            ENGLISH_APP_LANGUAGE_KEY -> {
+                englishLocalMessage(throwable = throwable)
+            }
+            else -> {
+                UiText.DynamicString(value = TIMEOUT_FA)
+            }
+        }
 
-            ENGLISH_APP_LANGUAGE_KEY -> { "" }
 
+    //TODO This Part Should Be Completed
+    private fun persianLocalMessage(throwable: Throwable): UiText = when (throwable) {
+        is TimeOutException -> {
+            UiText.DynamicString(value = TIMEOUT_FA)
+        }
+        else -> {
+            UiText.DynamicString(value = UNKNOWN_FA)
+        }
+    }
+
+    //TODO This Part Should Be Completed
+    private fun englishLocalMessage(throwable: Throwable): UiText = when (throwable) {
+        is TimeOutException -> {
+            UiText.DynamicString(value = TIMEOUT_EN)
+        }
+        else -> {
+            UiText.DynamicString(value = UNKNOWN_EN)
         }
     }
 }

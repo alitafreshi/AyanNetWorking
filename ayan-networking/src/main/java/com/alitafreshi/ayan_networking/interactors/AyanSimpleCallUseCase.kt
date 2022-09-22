@@ -6,13 +6,17 @@ import com.alitafreshi.ayan_networking.AyanRepository
 import com.alitafreshi.ayan_networking.Identity
 import com.alitafreshi.ayan_networking.constants.ApiErrorCode
 import com.alitafreshi.ayan_networking.constants.ApiSuccessCode
-import com.alitafreshi.ayan_networking.data_store.AppDataStore
-import com.alitafreshi.ayan_networking.data_store.readValue
+import com.alitafreshi.ayan_networking.constants.Constants
 import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.constants.exceptions.ServerErrorException
 import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.data_store.AppDataStore
+import com.alitafreshi.ayan_networking.data_store.readValue
 import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
-import com.alitafreshi.ayan_networking.state_handling.*
+import com.alitafreshi.ayan_networking.interactors.local_message_manager.LocalMessageHandlerUseCase
+import com.alitafreshi.ayan_networking.state_handling.RequestGenericState
+import com.alitafreshi.ayan_networking.state_handling.RequestState
+import com.alitafreshi.ayan_networking.state_handling.UIComponent
 import com.alitafreshi.ayan_networking.state_strategy.StateHandlingUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
@@ -26,6 +30,7 @@ class AyanSimpleCallUseCase(
     private val dataStore: DataStore<Preferences>,
     private val ayanHeaderManager: AyanHeaderManager,
     private val ioDispatcher: CoroutineDispatcher,
+    private val localMessageHandlerUseCas: LocalMessageHandlerUseCase,
     private val statsQueue: StateHandlingUseCase<UIComponent>
 ) {
     operator fun <Input, Output, Event> invoke(
@@ -79,15 +84,24 @@ class AyanSimpleCallUseCase(
 
     }.catch { throwable ->
         //TODO We For Positions That Servers Error Message Dose Not Has Any Error Message We Should Return A Default Message
+
+        val appLanguage = appDataState.readValue(
+            key = Constants.SELECTED_APP_LANGUAGE_KEY,
+            defaultValue = Constants.PERSIAN_APP_LANGUAGE_KEY,
+            dataStore = dataStore
+        )
+
         statsQueue.handleCancellation(
             throwable = throwable,
             uiComponent = UIComponent.Error(
-                errorDescription = UiText.DynamicString(
-                    value = throwable.message ?: ""
+                errorDescription = localMessageHandlerUseCas(
+                    appLanguage = appLanguage,
+                    throwable = throwable
                 )
             ),
             stateEvent = stateEvent
         )
+
     }.onCompletion {
         when (it) {
             is SuccessCompletionException -> {
