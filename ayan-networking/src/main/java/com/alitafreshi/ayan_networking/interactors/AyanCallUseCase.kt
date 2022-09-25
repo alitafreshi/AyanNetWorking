@@ -6,12 +6,17 @@ import com.alitafreshi.ayan_networking.AyanRepository
 import com.alitafreshi.ayan_networking.Identity
 import com.alitafreshi.ayan_networking.constants.ApiErrorCode
 import com.alitafreshi.ayan_networking.constants.Constants
+import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanException
+import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
-import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
 import com.alitafreshi.ayan_networking.interactors.local_message_manager.LocalMessageHandlerUseCase
-import com.alitafreshi.ayan_networking.state_handling.*
+import com.alitafreshi.ayan_networking.state_handling.DataState
+import com.alitafreshi.ayan_networking.state_handling.UIComponent
+import com.alitafreshi.ayan_networking.state_handling.UIComponentState
+import com.alitafreshi.ayan_networking.state_strategy.StateHandlingUseCase
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineName
 import kotlinx.coroutines.CoroutineScope
@@ -36,15 +41,12 @@ class AyanCallUseCase(
     ): Flow<DataState<Output, Event>> = flow<DataState<Output, Event>> {
 
 
-
         val result = ayanRepository.ayanCall<Input, Output>(
             baseUrl = baseUrl,
             endpoint = endpoint,
             input = input,
             identity = if (hasIdentity) appDataState.readValue<Identity>(
-                //TODO It Should Be Converted To the Constance
-                key = "ayan_token",
-                defaultValue = null,
+                key = USER_SAVE_TOKEN_KEY,
                 dataStore = dataStore
             ) else null,
             requestHeaders = ayanHeaderManager(requestHeaders = requestHeaders)
@@ -64,7 +66,7 @@ class AyanCallUseCase(
     }.onStart {
         emit(
             DataState.Loading(
-                bottomSheetState = UIComponentState.Loading,
+                loadingUiComponentState = UIComponentState.Loading,
                 stateEvent = stateEvent
             )
         )
@@ -89,7 +91,7 @@ class AyanCallUseCase(
             )
         )
     }.onCompletion {
-        emit(DataState.Loading(bottomSheetState = UIComponentState.Idle, stateEvent = stateEvent))
+        emit(DataState.Loading(loadingUiComponentState = UIComponentState.Idle, stateEvent = stateEvent))
     }.flowOn(ioDispatcher)
 }
 
@@ -98,7 +100,11 @@ sealed class LocalStateEvent {
     object GetData : LocalStateEvent()
 }
 
-class ViewModel(ayanCallUseCase: AyanCallUseCase, viewModelScope: CoroutineScope) {
+class ViewModel(
+    statsQueue: StateHandlingUseCase<UIComponent>,
+    ayanCallUseCase: AyanCallUseCase,
+    viewModelScope: CoroutineScope
+) {
     init {
         ayanCallUseCase<String, String, LocalStateEvent>(
             endpoint = "",
@@ -107,7 +113,7 @@ class ViewModel(ayanCallUseCase: AyanCallUseCase, viewModelScope: CoroutineScope
         ).onEach { dataState ->
             when (dataState) {
                 is DataState.Loading -> {
-                    println("The Request State = ${dataState.bottomSheetState} and the State Event is ${dataState.stateEvent}")
+                    println("The Request State = ${dataState.loadingUiComponentState} and the State Event is ${dataState.stateEvent}")
                 }
 
                 is DataState.Data -> {
@@ -116,6 +122,7 @@ class ViewModel(ayanCallUseCase: AyanCallUseCase, viewModelScope: CoroutineScope
 
                 is DataState.Error -> {
                     dataState.stateEvent
+                    if (dataState.)
                 }
             }
 

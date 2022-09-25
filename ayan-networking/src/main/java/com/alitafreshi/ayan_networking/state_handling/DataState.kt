@@ -14,7 +14,7 @@ sealed class DataState<DataType, StateEvent> {
     ) : DataState<DataType, StateEvent>()
 
     data class Loading<DataType, StateEvent>(
-        val bottomSheetState: BottomSheetState = BottomSheetState.Idle,
+        val loadingUiComponentState: UIComponentState = UIComponentState.Idle,
         val stateEvent: StateEvent
     ) : DataState<DataType, StateEvent>()
 }

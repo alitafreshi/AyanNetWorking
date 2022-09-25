@@ -7,6 +7,7 @@ import com.alitafreshi.ayan_networking.Identity
 import com.alitafreshi.ayan_networking.constants.ApiErrorCode
 import com.alitafreshi.ayan_networking.constants.ApiSuccessCode
 import com.alitafreshi.ayan_networking.constants.Constants
+import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
 import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
 import com.alitafreshi.ayan_networking.constants.exceptions.ServerErrorException
 import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
@@ -45,9 +46,7 @@ class AyanSimpleCallUseCase(
             endpoint = endpoint,
             input = input,
             identity = if (hasIdentity) appDataState.readValue<Identity>(
-                //TODO It Should Be Converted To the Constance
-                key = "ayan_token",
-                defaultValue = null,
+                key = USER_SAVE_TOKEN_KEY,
                 dataStore = dataStore
             ) else null,
             requestHeaders = ayanHeaderManager(requestHeaders = requestHeaders)
