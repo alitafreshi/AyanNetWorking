@@ -1,16 +1,42 @@
 package com.alitafreshi.ayan_networking.constants.exceptions
 
-import kotlinx.coroutines.CancellationException
-
 
 //TODO We Should Have Some Thing Like This To Be Able To Pass The Error Codes UpStream
-sealed class AyanException(message: String) : Throwable(message = message) {
-    class LoginRequiredException(message: String, causeCoroutineName: String? = null) :
-        AyanException(message = message)
+sealed class AyanServerException(message: String) :
+    Throwable(message = message) {
+
+    data class LoginRequiredException(
+        override val message: String,
+        val causeCoroutineName: String? = null,
+        val errorCode: String
+    ) : AyanServerException(message = message)
+
+    data class ServerErrorException(
+        override val message: String,
+        val errorCode: String,
+        val causeCoroutineName: String? = null
+    ) : AyanServerException(message = message)
+
+    data class SuccessCompletionException(override val message: String) :
+        AyanServerException(message = message)
+
+    data class TimeOutException(override val message: String) :
+        AyanServerException(message = message)
+
 }
 
 
-class LoginRequiredException(message: String, causeCoroutineName: String? = null) :
+
+sealed class AyanLocalException(message: String) : Throwable(message = message) {
+    data class UserCancellationException(override val message: String) :
+        AyanLocalException(message = message)
+
+    data class DataStoreUnknownException(override val message: String) :
+        AyanLocalException(message = message)
+}
+
+
+/*class LoginRequiredException(message: String, causeCoroutineName: String? = null) :
     CancellationException(message = message)
 
 class ServerErrorException(errorCode: String, message: String, causeCoroutineName: String? = null) :
@@ -22,5 +48,5 @@ class DataStoreUnknownException(message: String) : Exception(message = message)
 
 class SuccessCompletionException(message: String) : Exception(message = message)
 
-class TimeOutException(message: String) : Exception(message = message)
+class TimeOutException(message: String) : Exception(message = message)*/
 

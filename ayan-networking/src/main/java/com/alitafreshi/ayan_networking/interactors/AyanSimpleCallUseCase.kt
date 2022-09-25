@@ -8,9 +8,7 @@ import com.alitafreshi.ayan_networking.constants.ApiErrorCode
 import com.alitafreshi.ayan_networking.constants.ApiSuccessCode
 import com.alitafreshi.ayan_networking.constants.Constants
 import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
-import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
-import com.alitafreshi.ayan_networking.constants.exceptions.ServerErrorException
-import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
 import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
@@ -55,16 +53,17 @@ class AyanSimpleCallUseCase(
         if (result.status.code != ApiSuccessCode.Success)
             when (result.status.code) {
                 ApiErrorCode.LOGIN_REQUIRED -> {
-                    throw LoginRequiredException(
+                    throw AyanServerException.LoginRequiredException(
                         message = result.status.description,
-                        causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
+                        errorCode = result.status.code,
+                        causeCoroutineName = currentCoroutineContext()[CoroutineName]?.name
                     )
                 }
                 else -> {
-                    throw ServerErrorException(
+                    throw AyanServerException.ServerErrorException(
                         errorCode = result.status.code,
                         message = result.status.description,
-                        causeCoroutineName = currentCoroutineContext()[CoroutineName.Key]?.name
+                        causeCoroutineName = currentCoroutineContext()[CoroutineName]?.name
                     )
                 }
             }
@@ -103,7 +102,7 @@ class AyanSimpleCallUseCase(
 
     }.onCompletion {
         when (it) {
-            is SuccessCompletionException -> {
+            is AyanServerException.SuccessCompletionException -> {
                 statsQueue.remove(job = currentCoroutineContext().job)
             }
         }

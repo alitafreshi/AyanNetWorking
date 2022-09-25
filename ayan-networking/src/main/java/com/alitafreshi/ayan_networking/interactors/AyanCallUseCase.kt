@@ -7,8 +7,7 @@ import com.alitafreshi.ayan_networking.Identity
 import com.alitafreshi.ayan_networking.constants.ApiErrorCode
 import com.alitafreshi.ayan_networking.constants.Constants
 import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
-import com.alitafreshi.ayan_networking.constants.exceptions.AyanException
-import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
 import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
@@ -54,8 +53,9 @@ class AyanCallUseCase(
 
         when (result.status.code) {
             ApiErrorCode.LOGIN_REQUIRED -> {
-                throw LoginRequiredException(
+                throw AyanServerException.LoginRequiredException(
                     message = result.status.description,
+                    errorCode = result.status.code,
                     causeCoroutineName = currentCoroutineContext()[CoroutineName]?.name
                 )
             }
@@ -91,7 +91,12 @@ class AyanCallUseCase(
             )
         )
     }.onCompletion {
-        emit(DataState.Loading(loadingUiComponentState = UIComponentState.Idle, stateEvent = stateEvent))
+        emit(
+            DataState.Loading(
+                loadingUiComponentState = UIComponentState.Idle,
+                stateEvent = stateEvent
+            )
+        )
     }.flowOn(ioDispatcher)
 }
 
@@ -121,8 +126,9 @@ class ViewModel(
                 }
 
                 is DataState.Error -> {
-                    dataState.stateEvent
-                    if (dataState.)
+                    when (dataState.throwable) {
+
+                    }
                 }
             }
 
