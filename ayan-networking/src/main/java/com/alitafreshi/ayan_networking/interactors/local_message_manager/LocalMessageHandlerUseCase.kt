@@ -2,7 +2,7 @@ package com.alitafreshi.ayan_networking.interactors.local_message_manager
 
 import com.alitafreshi.ayan_networking.constants.Constants.ENGLISH_APP_LANGUAGE_KEY
 import com.alitafreshi.ayan_networking.constants.Constants.PERSIAN_APP_LANGUAGE_KEY
-import com.alitafreshi.ayan_networking.constants.exceptions.TimeOutException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.state_handling.UiText
 
 class LocalMessageHandlerUseCase {
@@ -36,7 +36,6 @@ class LocalMessageHandlerUseCase {
         const val UNKNOWN_AR = "خطأ غير معروف. يرجى الاتصال بالدعم."
     }
 
-    //TODO We Should Define That How We Provide Local Messages
     operator fun invoke(appLanguage: String, throwable: Throwable): UiText =
         throwable.message?.let { errorMessage ->
             UiText.DynamicString(value = errorMessage)
@@ -56,7 +55,7 @@ class LocalMessageHandlerUseCase {
 
     //TODO This Part Should Be Completed
     private fun persianLocalMessage(throwable: Throwable): UiText = when (throwable) {
-        is TimeOutException -> {
+        is AyanServerException.TimeOutException -> {
             UiText.DynamicString(value = TIMEOUT_FA)
         }
         else -> {
@@ -66,7 +65,7 @@ class LocalMessageHandlerUseCase {
 
     //TODO This Part Should Be Completed
     private fun englishLocalMessage(throwable: Throwable): UiText = when (throwable) {
-        is TimeOutException -> {
+        is AyanServerException.TimeOutException -> {
             UiText.DynamicString(value = TIMEOUT_EN)
         }
         else -> {
