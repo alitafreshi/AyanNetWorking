@@ -4,6 +4,7 @@ plugins {
     id(KotlinPlugins.kotlin)
     kotlin(KotlinPlugins.serialization) version "1.7.10"
     id(KotlinPlugins.maven)
+    id("com.jfrog.bintray") version "1.8.5"
 }
 
 java {
@@ -41,7 +42,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.2"
+            version = "0.0.3"
         }
     }
 }
