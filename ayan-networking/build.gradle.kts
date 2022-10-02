@@ -4,7 +4,6 @@ plugins {
     id(KotlinPlugins.kotlin)
     kotlin(KotlinPlugins.serialization) version "1.7.10"
     id(KotlinPlugins.maven)
-    id("com.jfrog.bintray") version "1.8.5"
 }
 
 java {
@@ -31,7 +30,9 @@ publishing {
             // Applies the component for the release build variant.
             // NOTE : Delete this line code if you publish Native Java / Kotlin Library
 //            from(components["release"])
-            from(components.getByName("java"))
+           // from(components.getByName("java"))
+            from(components["java"])
+
 
             // Library Package Name (Example : "com.frogobox.androidfirstlib")
             // NOTE : Different GroupId For Each Library / Module, So That Each Library Is Not Overwritten
@@ -42,7 +43,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.3"
+            version = "0.0.4"
         }
     }
 }
