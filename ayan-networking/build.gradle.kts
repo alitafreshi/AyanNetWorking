@@ -1,6 +1,7 @@
 plugins {
     id(Plugins.javaLibrary)
     kotlin(KotlinPlugins.jvm)
+    id(KotlinPlugins.kotlin)
     kotlin(KotlinPlugins.serialization) version "1.7.10"
     id(KotlinPlugins.maven)
 }
@@ -40,7 +41,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.1"
+            version = "0.0.2"
         }
     }
 }
