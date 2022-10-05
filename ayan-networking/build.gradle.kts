@@ -21,7 +21,6 @@ dependencies {
     implementation(Ktor.ktor_ktor_serialization_kotlinx_json)
     //Data store
     implementation(DataStore.data_store)
-    implementation("com.github.gundy:semver4j:0.16.4")
 }
 
 publishing {

@@ -5,10 +5,10 @@ object Build {
     const val kotlinxSerializationGradlePlugin = "org.jetbrains.kotlin:kotlin-serialization:${Kotlin.version}"
     const val kaptGradlePlugin = "org.jetbrains.kotlin.kapt:${Kotlin.version}"
     const val hiltGradlePlugin = "com.google.dagger:hilt-android-gradle-plugin:${Hilt.version}"
-    private const val jitpackGradleBuildVersion = "2.1"
+    private const val jitpackGradleBuildVersion = "0.16.4"
 
-    const val jitpackGradlePlugin =
-        "com.github.dcendents:android-maven-gradle-plugin:${jitpackGradleBuildVersion}"
+    const val jitpackKotlinGradlePlugin =
+        "com.github.gundy:semver4j:${jitpackGradleBuildVersion}"
 
 
 }

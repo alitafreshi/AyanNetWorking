@@ -14,6 +14,7 @@ buildscript {
     dependencies {
         classpath(Build.buildTools)
         classpath(Build.kotlinGradlePlugin)
+        classpath(Build.jitpackKotlinGradlePlugin)
     }
 }
 
