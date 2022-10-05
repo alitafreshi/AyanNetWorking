@@ -1,9 +1,7 @@
 package com.alitafreshi.ayan_networking.interactors.state
 
-import com.alitafreshi.ayan_networking.constants.exceptions.DataStoreUnknownException
-import com.alitafreshi.ayan_networking.constants.exceptions.LoginRequiredException
-import com.alitafreshi.ayan_networking.constants.exceptions.SuccessCompletionException
-import com.alitafreshi.ayan_networking.constants.exceptions.UserCancellationException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanLocalException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.state_handling.RequestGenericState
 import com.alitafreshi.ayan_networking.state_handling.RequestState
 import com.alitafreshi.ayan_networking.state_strategy.ExceptionHandler
@@ -60,7 +58,7 @@ class StateHandlingUseCaseImpl<T>(
     override fun handleCancellation(uiComponent: T, throwable: Throwable?, stateEvent: Any?) {
         //TODO We need Each Logic For Each Exception Not One Handler For All Exceptions
         when (throwable) {
-            is LoginRequiredException, is DataStoreUnknownException -> {
+            is AyanServerException.LoginRequiredException, is AyanLocalException.DataStoreUnknownException -> {
                 _items.updateAndGet {
                     loginRequiredExceptionHandler(
                         currentRequests = it,
@@ -70,7 +68,7 @@ class StateHandlingUseCaseImpl<T>(
                 }
             }
             //TODO We Don't Do Anything Here
-            is SuccessCompletionException -> {}
+            is AyanServerException.SuccessCompletionException -> {}
 
             else -> {
                 //TODO May Be Some unexpected exceptions happen during the network call we should handle them here
@@ -89,10 +87,14 @@ class StateHandlingUseCaseImpl<T>(
         _items.updateAndGet {
             it.map { requestItem ->
                 //TODO We Should Pass A Default Message Here
-                requestItem.job?.cancel(cause = UserCancellationException(message = ""))
+                //TODO Fixed The Coroutines Cancellations Exception Type
+                //requestItem.job?.cancel(cause = AyanLocalException.UserCancellationException(message = ""))
                 requestItem.copy(
                     job = null,
-                    requestState = RequestState.Error(throwable = UserCancellationException(message = ""))
+                    requestState = RequestState.Error(throwable = AyanLocalException.UserCancellationException(
+                        message = ""
+                    )
+                    )
                 )
 
             }.toMutableList()

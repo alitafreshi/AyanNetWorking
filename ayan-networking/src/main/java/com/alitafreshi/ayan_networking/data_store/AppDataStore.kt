@@ -3,7 +3,7 @@ package com.alitafreshi.ayan_networking.data_store
 import androidx.datastore.core.DataStore
 import androidx.datastore.preferences.core.*
 import com.alitafreshi.ayan_networking.Identity
-import com.alitafreshi.ayan_networking.constants.exceptions.DataStoreUnknownException
+import com.alitafreshi.ayan_networking.constants.exceptions.AyanLocalException
 import kotlinx.coroutines.flow.first
 
 interface AppDataStore {
@@ -26,5 +26,5 @@ suspend inline fun <reified T> AppDataStore.readValue(
     Double::class -> (dataStore.data.first()[doublePreferencesKey(key)] ?: defaultValue) as T
     Long::class -> (dataStore.data.first()[longPreferencesKey(key)] ?: defaultValue) as T
     Identity::class -> (Identity(token = dataStore.data.first()[stringPreferencesKey(key)])) as T
-    else -> throw DataStoreUnknownException("Unknown Data Type Please Use Primitive Data Types")
+    else -> throw AyanLocalException.DataStoreUnknownException("Unknown Data Type Please Use Primitive Data Types")
 }

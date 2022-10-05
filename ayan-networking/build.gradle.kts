@@ -43,7 +43,10 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.6"
+            version = "0.0.7"
         }
+    }
+    repositories {
+        maven(url = "https://jitpack.io")
     }
 }
