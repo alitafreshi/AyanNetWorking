@@ -13,7 +13,7 @@ buildscript {
     dependencies {
         classpath(Build.buildTools)
         classpath(Build.kotlinGradlePlugin)
-        classpath("com.github.gundy:semver4j:0.16.4")
+        //classpath(Build.jitpackKotlinGradlePlugin)
     }
 }
 
