@@ -5,7 +5,6 @@ tasks.register("clean", Delete::class) {
 
 buildscript {
     repositories {
-        maven(url = "https://jitpack.io")
         google()
         mavenLocal()
         mavenCentral()
@@ -14,7 +13,7 @@ buildscript {
     dependencies {
         classpath(Build.buildTools)
         classpath(Build.kotlinGradlePlugin)
-        classpath(Build.jitpackKotlinGradlePlugin)
+        classpath("com.github.gundy:semver4j:0.16.4")
     }
 }
 
