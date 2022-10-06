@@ -28,7 +28,7 @@ publishing {
         // Creates a Maven publication called "release".
         register("release", MavenPublication::class) {
             // Applies the component for the release build variant.
-            // NOTE : Delete this line code if you publish Native Java / Kotlin Library
+                // NOTE : Delete this line code if you publish Native Java / Kotlin Library
 //            from(components["release"])
            // from(components.getByName("java"))
             from(components["java"])
@@ -43,7 +43,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.11"
+            version = "0.0.12"
         }
     }
 }
