@@ -86,9 +86,7 @@ class StateHandlingUseCaseImpl<T>(
     override fun cancelByUser() {
         _items.updateAndGet {
             it.map { requestItem ->
-                //TODO We Should Pass A Default Message Here
-                //TODO Fixed The Coroutines Cancellations Exception Type
-                //requestItem.job?.cancel(cause = AyanLocalException.UserCancellationException(message = ""))
+                requestItem.job?.cancel(cause = AyanLocalException.UserCancellationException())
                 requestItem.copy(
                     job = null,
                     requestState = RequestState.Error(throwable = AyanLocalException.UserCancellationException(
