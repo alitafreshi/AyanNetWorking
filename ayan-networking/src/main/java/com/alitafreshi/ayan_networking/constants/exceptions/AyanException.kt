@@ -29,10 +29,11 @@ sealed class AyanServerException(message: String) :
 
 
 sealed class AyanLocalException(message: String) : CancellationException(message = message) {
-    data class UserCancellationException(override val message: String) :
+
+     class UserCancellationException(override val message: String) :
         AyanLocalException(message = message)
 
-    data class DataStoreUnknownException(override val message: String) :
+     class DataStoreUnknownException(override val message: String) :
         AyanLocalException(message = message)
 }
 
