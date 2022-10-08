@@ -1,7 +1,5 @@
 package com.alitafreshi.ayan_networking.constants.exceptions
 
-import kotlin.coroutines.cancellation.CancellationException
-
 
 //TODO We Should Have Some Thing Like This To Be Able To Pass The Error Codes UpStream
 sealed class AyanServerException(message: String) :
@@ -28,7 +26,7 @@ sealed class AyanServerException(message: String) :
 }
 
 
-sealed class AyanLocalException(message: String) : CancellationException(message = message) {
+sealed class AyanLocalException(message: String) : Throwable(message = message) {
 
      class UserCancellationException(override val message: String) :
         AyanLocalException(message = message)

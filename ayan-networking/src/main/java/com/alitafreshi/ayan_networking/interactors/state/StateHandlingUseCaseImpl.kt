@@ -86,12 +86,13 @@ class StateHandlingUseCaseImpl<T>(
     override fun cancelByUser() {
         _items.updateAndGet {
             it.map { requestItem ->
-                requestItem.job?.cancel(cause = AyanLocalException.UserCancellationException(message = "User Cancel The Request / job"))
+                requestItem.job?.cancel()
                 requestItem.copy(
                     job = null,
-                    requestState = RequestState.Error(throwable = AyanLocalException.UserCancellationException(
-                        message = ""
-                    )
+                    requestState = RequestState.Error(
+                        throwable = AyanLocalException.UserCancellationException(
+                            message = "User Cancel The Request / job"
+                        )
                     )
                 )
 
