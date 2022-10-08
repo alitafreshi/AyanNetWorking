@@ -29,7 +29,7 @@ sealed class AyanServerException(message: String) :
 
 
 sealed class AyanLocalException(message: String) : CancellationException(message = message) {
-    data class UserCancellationException(override val message: String = "User Cancel The Request / job") :
+    data class UserCancellationException(override val message: String) :
         AyanLocalException(message = message)
 
     data class DataStoreUnknownException(override val message: String) :
