@@ -26,5 +26,5 @@ suspend inline fun <reified T> AppDataStore.readValue(
     Double::class -> (dataStore.data.first()[doublePreferencesKey(key)] ?: defaultValue) as T
     Long::class -> (dataStore.data.first()[longPreferencesKey(key)] ?: defaultValue) as T
     Identity::class -> (Identity(token = dataStore.data.first()[stringPreferencesKey(key)])) as T
-    else -> throw AyanLocalException.DataStoreUnknownException("Unknown Data Type Please Use Primitive Data Types")
+    else -> throw AyanLocalException.DataStoreUnknownException(message = "Unknown Data Type Please Use Primitive Data Types")
 }
