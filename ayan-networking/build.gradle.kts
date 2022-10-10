@@ -14,13 +14,16 @@ java {
 dependencies {
 
     //Ktor
-    implementation(Ktor.ktor_client_core)
-    implementation(Ktor.ktor_client_okhttp)
-    implementation(Ktor.ktor_client_logging)
-    implementation(Ktor.ktor_client_content_negotiation)
-    implementation(Ktor.ktor_ktor_serialization_kotlinx_json)
+    api(Ktor.ktor_client_core)
+    api(Ktor.ktor_client_okhttp)
+    api(Ktor.ktor_client_logging)
+    api(Ktor.ktor_client_content_negotiation)
+    api(Ktor.ktor_ktor_serialization_kotlinx_json)
     //Data store
-    implementation(DataStore.data_store)
+    api(DataStore.data_store)
+
+    //javax
+    implementation(Hilt.javaInject)
 }
 
 publishing {
@@ -43,7 +46,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.19"
+            version = "0.0.20"
         }
     }
 }
