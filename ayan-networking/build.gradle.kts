@@ -46,7 +46,7 @@ publishing {
             artifactId = "ayan-networking"
 
             // Version Library Name (Example : "1.0.0")
-            version = "0.0.20"
+            version = "0.0.21"
         }
     }
 }

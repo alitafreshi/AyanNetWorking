@@ -11,7 +11,7 @@ import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
 import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
-import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
+import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManagerUseCase
 import com.alitafreshi.ayan_networking.interactors.local_message_manager.LocalMessageHandlerUseCase
 import com.alitafreshi.ayan_networking.state_handling.RequestGenericState
 import com.alitafreshi.ayan_networking.state_handling.RequestState
@@ -25,9 +25,9 @@ import kotlinx.coroutines.job
 
 class AyanSimpleCallUseCase(
     private val ayanRepository: AyanRepository,
-    private val appDataState: AppDataStore,
+    private val appDataStore: AppDataStore,
     private val dataStore: DataStore<Preferences>,
-    private val ayanHeaderManager: AyanHeaderManager,
+    private val ayanHeaderManagerUseCase: AyanHeaderManagerUseCase,
     private val ioDispatcher: CoroutineDispatcher,
     private val localMessageHandlerUseCas: LocalMessageHandlerUseCase,
     private val statsQueue: StateHandlingUseCase<UIComponent>
@@ -43,11 +43,11 @@ class AyanSimpleCallUseCase(
         val result = ayanRepository.simpleCall<Input, Output>(
             endpoint = endpoint,
             input = input,
-            identity = if (hasIdentity) appDataState.readValue<Identity>(
+            identity = if (hasIdentity) appDataStore.readValue<Identity>(
                 key = USER_SAVE_TOKEN_KEY,
                 dataStore = dataStore
             ) else null,
-            requestHeaders = ayanHeaderManager(requestHeaders = requestHeaders)
+            requestHeaders = ayanHeaderManagerUseCase(requestHeaders = requestHeaders)
         )
 
         if (result.status.code != ApiSuccessCode.Success)
@@ -83,7 +83,7 @@ class AyanSimpleCallUseCase(
     }.catch { throwable ->
         //TODO We For Positions That Servers Error Message Dose Not Has Any Error Message We Should Return A Default Message
 
-        val appLanguage = appDataState.readValue(
+        val appLanguage = appDataStore.readValue(
             key = Constants.SELECTED_APP_LANGUAGE_KEY,
             defaultValue = Constants.PERSIAN_APP_LANGUAGE_KEY,
             dataStore = dataStore

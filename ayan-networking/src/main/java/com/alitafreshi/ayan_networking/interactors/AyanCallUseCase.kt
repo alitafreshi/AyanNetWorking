@@ -10,7 +10,7 @@ import com.alitafreshi.ayan_networking.constants.Constants.USER_SAVE_TOKEN_KEY
 import com.alitafreshi.ayan_networking.constants.exceptions.AyanServerException
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
-import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManager
+import com.alitafreshi.ayan_networking.interactors.header_manager.AyanHeaderManagerUseCase
 import com.alitafreshi.ayan_networking.interactors.local_message_manager.LocalMessageHandlerUseCase
 import com.alitafreshi.ayan_networking.state_handling.DataState
 import com.alitafreshi.ayan_networking.state_handling.UIComponent
@@ -26,7 +26,7 @@ class AyanCallUseCase(
     private val ayanRepository: AyanRepository,
     private val appDataState: AppDataStore,
     private val dataStore: DataStore<Preferences>,
-    private val ayanHeaderManager: AyanHeaderManager,
+    private val ayanHeaderManager: AyanHeaderManagerUseCase,
     private val localMessageHandlerUseCas: LocalMessageHandlerUseCase,
     private val ioDispatcher: CoroutineDispatcher
 ) {

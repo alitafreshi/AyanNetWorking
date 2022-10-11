@@ -8,7 +8,7 @@ import com.alitafreshi.ayan_networking.constants.Constants.SELECTED_APP_LANGUAGE
 import com.alitafreshi.ayan_networking.data_store.AppDataStore
 import com.alitafreshi.ayan_networking.data_store.readValue
 
-class AyanHeaderManager(
+class AyanHeaderManagerUseCase(
     private val appDataState: AppDataStore,
     private val dataStore: DataStore<Preferences>
 ) {
